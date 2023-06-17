@@ -1,0 +1,112 @@
+#include <NewPing.h>
+#include <Servo.h>
+
+#define TRIGGER_PIN 8
+#define ECHO_PIN 9
+#define MAX_DISTANCE 200
+
+#define MOTOR1_PIN1 2
+#define MOTOR1_PIN2 3
+#define MOTOR2_PIN1 4
+#define MOTOR2_PIN2 5
+
+#define ENABLE_PIN1 5
+#define ENABLE_PIN2 6
+
+#define SERVO_PIN 10
+
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+Servo servoMotor;
+
+void setup() {
+  pinMode(MOTOR1_PIN1, OUTPUT);
+  pinMode(MOTOR1_PIN2, OUTPUT);
+  pinMode(MOTOR2_PIN1, OUTPUT);
+  pinMode(MOTOR2_PIN2, OUTPUT);
+  pinMode(ENABLE_PIN1, OUTPUT);
+  pinMode(ENABLE_PIN2, OUTPUT);
+
+  digitalWrite(ENABLE_PIN1, HIGH);
+  digitalWrite(ENABLE_PIN2, HIGH);
+
+  servoMotor.attach(SERVO_PIN);
+}
+
+void moveForward() {
+  digitalWrite(MOTOR1_PIN1, HIGH);
+  digitalWrite(MOTOR1_PIN2, LOW);
+  digitalWrite(MOTOR2_PIN1, HIGH);
+  digitalWrite(MOTOR2_PIN2, LOW);
+}
+
+void moveBackward() {
+  digitalWrite(MOTOR1_PIN1, LOW);
+  digitalWrite(MOTOR1_PIN2, HIGH);
+  digitalWrite(MOTOR2_PIN1, LOW);
+  digitalWrite(MOTOR2_PIN2, HIGH);
+}
+
+void turnLeft() {
+  digitalWrite(MOTOR1_PIN1, LOW);
+  digitalWrite(MOTOR1_PIN2, HIGH);
+  digitalWrite(MOTOR2_PIN1, HIGH);
+  digitalWrite(MOTOR2_PIN2, LOW);
+}
+
+void turnRight() {
+  digitalWrite(MOTOR1_PIN1, HIGH);
+  digitalWrite(MOTOR1_PIN2, LOW);
+  digitalWrite(MOTOR2_PIN1, LOW);
+  digitalWrite(MOTOR2_PIN2, HIGH);
+}
+
+void stopMoving() {
+  digitalWrite(MOTOR1_PIN1, LOW);
+  digitalWrite(MOTOR1_PIN2, LOW);
+  digitalWrite(MOTOR2_PIN1, LOW);
+  digitalWrite(MOTOR2_PIN2, LOW);
+}
+
+void rotateServo() {
+  for (int angle = 0; angle <= 180; angle += 5) {
+    servoMotor.write(angle);
+    delay(50);
+    unsigned int distance = sonar.ping_cm();
+    if (distance > 0 && distance <= 15) {
+      return;
+    }
+  }
+}
+
+void loop() {
+  moveForward();
+  unsigned int distance = sonar.ping_cm();
+  if (distance > 0 && distance <= 15) {
+    stopMoving();
+    delay(500);
+    rotateServo();
+    delay(500);
+    distance = sonar.ping_cm();
+    if (distance > 15) {
+      moveForward();
+      delay(500);
+    } else {
+      turnLeft();
+      delay(500);
+      stopMoving();
+      delay(500);
+      rotateServo();
+      delay(500);
+      distance = sonar.ping_cm();
+      if (distance > 15) {
+        moveForward();
+        delay(500);
+      } else {
+        turnRight();
+        delay(500);
+        stopMoving();
+        delay(500);
+      }
+    }
+  }
+}
