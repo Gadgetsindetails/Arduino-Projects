@@ -1,0 +1,27 @@
+//This code is for how to interface irsensor with arduino
+//Visit https://www.youtube.com/channel/UCd5x9xFqKaRyU15Mgmim7sw for more exciting projects
+
+
+int irsensor =7;
+int led=8;
+
+void setup() {
+  pinMode(led, OUTPUT);
+  pinMode(irsensor, INPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+int sensorvlaue=digitalRead(sensor);
+
+  if(sensorvlaue==LOW){
+  digitalWrite(led, HIGH);
+  }
+  else{  
+  digitalWrite(led,LOW);
+  }
+Serial.print("Sensor value : ");
+Serial.println(sensorvlaue);
+delay(700);  
+}
