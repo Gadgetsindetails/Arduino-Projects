@@ -1,0 +1,72 @@
+// Project by "Gadgets in Details"
+// Explore DIY electronics, Arduino projects, and home automation tutorials.
+// Subscribe to our YouTube channel for more detailed tech projects and guides!
+//https://www.youtube.com/@gadgetsindetails
+
+#include <Servo.h>
+
+Servo gateServo;
+
+// Define pins for the two IR sensors
+int irSensorIn = 2;     // IR sensor for "In" detection
+int irSensorOut = 3;    // IR sensor for "Out" detection
+
+// Define pins for the LED and buzzer
+int ledPin = 4;         // Pin for the LED
+int buzzerPin = 5;      // Pin for the buzzer
+
+// Define gate open and close positions
+int gatePosOpen = 90
+;   // Angle for the gate when open
+int gatePosClose = 180;   // Angle for the gate when closed
+
+void setup() {
+  // Attach the servo to pin 6
+  gateServo.attach(6);
+
+  // Set IR sensor pins as input
+  pinMode(irSensorIn, INPUT);
+  pinMode(irSensorOut, INPUT);
+
+  // Set LED and buzzer pins as output
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+
+  // Ensure gate starts in closed position and LED/buzzer are off
+  gateServo.write(gatePosClose);
+  digitalWrite(ledPin, LOW);     // Turn off LED
+  digitalWrite(buzzerPin, LOW);  // Turn off buzzer
+}
+
+void loop() {
+  // Read the values of the two IR sensors
+  int sensorInValue = digitalRead(irSensorIn);
+  int sensorOutValue = digitalRead(irSensorOut);
+
+  // If the "In" sensor is triggered (HIGH)
+  if (sensorInValue == LOW) {
+    gateServo.write(gatePosOpen);    // Open the gate
+    blinkLedAndBuzzer();             // Blink LED and buzzer for 5 seconds
+    gateServo.write(gatePosClose);   // Close the gate
+  }
+
+  // If the "Out" sensor is triggered (HIGH)
+  if (sensorOutValue == LOW) {
+    gateServo.write(gatePosOpen);    // Open the gate
+    blinkLedAndBuzzer();             // Blink LED and buzzer for 5 seconds
+    gateServo.write(gatePosClose);   // Close the gate
+  }
+}
+
+// Function to blink LED and buzzer for 5 seconds
+void blinkLedAndBuzzer() {
+  for (int i = 0; i < 5; i++) {    // Loop for 5 seconds (1000ms delay * 5)
+    digitalWrite(ledPin, HIGH);    // Turn on LED
+    digitalWrite(buzzerPin, HIGH); // Turn on buzzer
+    delay(300);                    // Wait for 0.5 seconds
+    
+    digitalWrite(ledPin, LOW);     // Turn off LED
+    digitalWrite(buzzerPin, LOW);  // Turn off buzzer
+    delay(300);                    // Wait for 0.5 seconds
+  }
+}
